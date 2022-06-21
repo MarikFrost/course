@@ -1,0 +1,82 @@
+MySql:
+        Типы данных:
+            INT                 - целые числа
+            DEC                 - десятичные
+            BLOB/TEXT/MEMO      - большой объем текстовой информации
+            CHAR, VARCHAR       - строки, текст
+            DATE, TIME, YEAR    - форматы даты
+            FLOAT, DOUBLE       - данные с плавающей точкой
+            TIMESTAMP           - хранит 4-байтное целое число, равное количеству секунд, прошедших с полуночи 1 января 1970 года по усредненному времени Гринвича (т.е. нулевой часовой пояс, точка отсчета часовых поясов)
+            BOOLEAN             - true/false
+            NULL                - пустое значение
+
+        Работа с БД: 
+            SHOW databases;             - посмотреть какие есть БД
+            CREATE database students;   - создаем базу данных students
+            DROP database test;         - удаляем базу данных test
+            USE students;               - выбираем базу данных students для работы
+            SHOW tables;                - показать все таблицы в этой БД
+
+        Работа с таблицами:
+            CREATE table courses                - нажимаем enter и вводим столбцы которые будут:
+            (id INT(11) NOT NULL PRIMARY KEY,   - id 11 цифр максиму, не может быть пустой (NOT NULL), и что это PRIMARY KEY 
+                    faculty VARCHAR(55) NULL,  
+                    Number INT(2) NULL);
+
+            SELECT * FROM courses;                                      - посмотреть данные из таблицы courses
+            DESC courses;                                               - посмотреть какие поля есть в таблице и типы данных
+            DROP table courses;                                         - удаление таблицы courses
+            INSERT INTO courses VALUES (1, ‘Program’, 3);               - добавляем значения в таблицу. Если заполняем все ячейки.
+            INSERT INTO courses(id, Faculty) VALUES(2, ‘Bio’);          - если нужно заполнить некоторые ячейки
+            DELETE FROM courses;                                        - удалить все данные из таблицы
+            DELETE FROM courses WHERE faculty=’bio’;                    - удалить строку, где в столбце faculty значение bio
+            UPDATE courses SET faculty='gum' WHERE faculty='Program';   - обновим данные в таблице courses, вставим значение gum в столбец faculty вместо значения Program в столбце faculty.
+            ALTER TABLE courses DROP COLUMN id;                         - удаляем столбец id из таблицы courses.
+            ALTER TABLE courses ADD COLUMN id INT AFTER number;         - вставить столбец id после столбце number.
+            ALTER TABLE courses ADD COLUMN top INT FIRST/SECOND;        - вставить столбец top первым или вторым…
+
+        SELECT в DB: 
+            SELECT * FROM courses;                                          - вывести данные из таблицы courses
+            SELECT DISTINCT number FROM courses;                            - вывод значений в number и отсекает все повторяющиеся значения.
+            SELECT * FROM courses LIMIT 2;                                  - вывести из таблицы courses первые две записи.
+            SELECT number AS номер FROM courses;                            - псевдоним. Выводим данные из столбца Number и даем ему временный псевдоним номер.
+            SELECT faculty, number FROM courses WHERE faculty = 'bio';      - вывести данные из faculty и Number только там где faculty = bio
+            SELECT faculty, number FROM courses WHERE number > 2;           - вывести данные из faculty и Number только там где number > 2
+            SELECT * From courses WHERE number = 3 AND faculty = 'Bio';     - выводим всю строку только там, где number = 3 и faculty = ‘Bio’   Оба должны совпадать
+            SELECT * From courses WHERE number = 3 AND faculty = 'Bio';     - выводим все строки только там, где number = 3 или faculty = ‘Bio’  должно соответствовать хотя бы одно условие.
+            SELECT * FROM courses WHERE faculty LIKE “%m”;                  - выводим все значения где faculty заканчивается на m.
+            SELECT * FROM courses WHERE faculty LIKE '___%m';               - выводим все значения где faculty заканчивается на m и впереди есть три символа (нижнее подчеркивание один символ.)
+                                    _m%                                     - это где перед m есть один символ и после все равно сколько.
+                                    _io                                     - заканчивается на io и впереди есть один символ
+                                    o_                                      - начинается на o и после есть символ
+            SELECT * FROM Customers WHERE City LIKE '[acs]%';               - где начало или на a или с или s
+            SELECT * FROM Customers WHERE City LIKE ' [!acf]%';             - первая буква не a,c,f
+            SELECT * FROM courses WHERE number BETWEEN 2 AND 4;             - показать все значения где number находится от 2 до 4.
+            SELECT * FROM courses WHERE NOT number BETWEEN 2 AND 4;         - показываем всю информацию,где number не содержит значения от 2 до4
+            SELECT * FROM courses WHERE number IN(4,2,6);                   - показываем все значения где значения number = 4 и 2 и 6
+            SELECT * FROM courses WHERE (faculty = "GEO" OR faculty = "Bio") AND number = 6;    - выводим информацию где faculty = GEO или faculty = Bio, и одновременно number = 6.
+            SELECT * FROM courses ORDER BY faculty;                         - сортировка по возрастанию в поле faculty
+            SELECT * FROM courses ORDER BY faculty DESC;                    - в обратном порядку или по убыванию.
+            SELECT * FROM courses WHERE faculty IS NULL;                    - где пустые значения
+
+        Агрегатные функции:
+            SELECT MIN(number) FROM courses; - MIN - минимальное значение
+            MAX - максимальное значение
+            SUM - сумму значение
+            AVG - среднее арифметическое
+            COUNT - количество записей 
+
+Join - позволяют объединять две или более таблиц по полю которое в этих таблицах одинаковое. Существует три типа джоинов: 
+
+Inner Join - внутреннее объединение. Если у нас есть две таблицы и в ней есть поле которое идентично для A и B и значение 
+в ней совпадают. Если не совпадают они не показываются. Мы можем провести внутреннее объединение.
+    SELECT courses.faculty, general.fname, general.lname FROM courses Join general ON courses.id = general.id;
+
+Right Join - объединяем по правой таблице. Показывает все строки из таблицы B и если этих строк нет, то заменяется NULL
+    SELECT courses.number, general.fname, general.lname FROM courses RIGHT JOIN general ON courses.id = general.id;
+
+Left Join - объединяем по левой таблице. Показывает все строки из таблицы A и если этих строк нет, то заменяется NULL
+    SELECT courses.number, general.fname, general.lname FROM courses LEFT JOIN general ON courses.id = general.id;
+
+Вложенные подзапросы - если мы не можем с помощью одного SELECT достать нужную информацию, мы можем использовать Select внутри select:
+    SELECT lname, fname, id FROM test where id IN (SELECT id FROM test where id > 2 AND lname = ‘Dima’);
